@@ -1,0 +1,15 @@
+.env
+.env.local
+backend/.env
+llm-proxy/.env
+backend/target/
+backend/data/
+backend/uploads/
+frontend/node_modules/
+frontend/dist/
+llm-proxy/node_modules/
+*.log
+.DS_Store
+
+# Contains the Google Maps API key for the local MCP server
+.cursor/mcp.json

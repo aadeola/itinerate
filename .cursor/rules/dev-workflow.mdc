@@ -1,0 +1,47 @@
+---
+description: Local dev restarts, env files, and API keys for itinerate
+alwaysApply: true
+---
+
+# Itinerate dev workflow
+
+## Services and ports
+
+| Service | Port | Start command |
+|---------|------|---------------|
+| Frontend (Vite) | 5173 | `cd frontend && npm run dev` |
+| Backend (Spring Boot) | 8080 | `set -a && source backend/.env && set +a && cd backend && mvn spring-boot:run` |
+| llm-proxy (Node) | 8081 | `cd llm-proxy && npm run start` |
+
+Or proxy + backend together: `./scripts/dev.sh`
+
+## When to restart
+
+Spring Boot and llm-proxy do **not** hot-reload. Restart after changes:
+
+- **Backend (8080):** any edit to `backend/src/**`, `backend/.env`, or `application.properties`
+- **llm-proxy (8081):** any edit to `llm-proxy/server.js` or `llm-proxy/.env`
+- **Frontend (5173):** Vite HMR handles normal `.tsx`/`.ts` edits — no restart needed
+
+After changing `backend/.env`, always restart the backend with env loaded:
+
+```bash
+set -a && source backend/.env && set +a && mvn spring-boot:run
+```
+
+## API keys (all required for full functionality)
+
+| Key | File | Used for |
+|-----|------|----------|
+| `CURSOR_API_KEY` | `llm-proxy/.env` | Itinerary planning + Maps MCP agent runs |
+| `GOOGLE_MAPS_API_KEY` | `llm-proxy/.env` | Screenshot → place resolution via Google Maps MCP |
+| `ITINERARY_LLM_API_KEY` | `backend/.env` | Any non-empty value (auth placeholder for local proxy) |
+| `ITINERARY_VISION_API_KEY` | `backend/.env` | Screenshot inference via Google Gemini (Google AI Studio) |
+
+Never commit `.env` files. After adding or changing keys, restart the affected service.
+
+## Agent behavior
+
+When modifying backend Java or `backend/.env`, restart the backend and verify port 8080 is listening before asking the user to test.
+
+When modifying `llm-proxy/`, restart the proxy and verify port 8081 responds to `GET /health`.

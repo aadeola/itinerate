@@ -1,0 +1,290 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    @apply font-sans antialiased;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    background-image:
+      radial-gradient(ellipse 90% 55% at 50% -15%, rgba(0, 0, 0, 0.03), transparent),
+      radial-gradient(ellipse 55% 45% at 100% 100%, rgba(0, 0, 0, 0.04), transparent),
+      radial-gradient(ellipse 45% 35% at 0% 85%, rgba(0, 0, 0, 0.02), transparent);
+    @apply text-foreground;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(ellipse 90% 55% at 50% -15%, rgba(255, 255, 255, 0.04), transparent),
+      radial-gradient(ellipse 55% 45% at 100% 100%, rgba(255, 255, 255, 0.03), transparent),
+      radial-gradient(ellipse 45% 35% at 0% 85%, rgba(255, 255, 255, 0.02), transparent);
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float-in {
+  animation: floatIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: #f4f4f4;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #000000;
+  --popover-foreground: #ffffff;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f0f0;
+  --secondary-foreground: #000000;
+  --muted: #f5f5f5;
+  --muted-foreground: #6b7280;
+  --accent: #ebebeb;
+  --accent-foreground: #000000;
+  --destructive: #171717;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #000000;
+  --chart-1: #000000;
+  --chart-2: #404040;
+  --chart-3: #737373;
+  --chart-4: #a3a3a3;
+  --chart-5: #d4d4d4;
+  --radius: 1.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #000000;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #000000;
+
+  --spacing-btn-x: 1rem;
+  --spacing-btn-y: 0.5rem;
+  --spacing-btn-lg-x: 1.5rem;
+  --spacing-btn-lg-y: 0.75rem;
+  --spacing-input-x: 0.75rem;
+  --spacing-input-y: 0.5rem;
+  --spacing-card: 1.25rem;
+  --spacing-card-lg: 1.5rem;
+  --spacing-page: 1.5rem;
+  --spacing-label-bottom: 0.375rem;
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 2px 8px rgb(0 0 0 / 0.08), 0 12px 32px rgb(0 0 0 / 0.06);
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #262626;
+  --secondary-foreground: #ffffff;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #333333;
+  --accent-foreground: #ffffff;
+  --destructive: #fafafa;
+  --border: #404040;
+  --input: #404040;
+  --ring: #ffffff;
+  --chart-1: #ffffff;
+  --chart-2: #d4d4d4;
+  --chart-3: #a3a3a3;
+  --chart-4: #737373;
+  --chart-5: #525252;
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #333333;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #404040;
+  --sidebar-ring: #ffffff;
+}
+
+@layer utilities {
+  .card-panel {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    background-color: var(--card);
+    color: var(--card-foreground);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-panel-lg {
+    padding: var(--spacing-card-lg);
+  }
+
+  @media (min-width: 640px) {
+    .card-panel-lg {
+      padding: calc(var(--spacing-card-lg) + 0.5rem);
+    }
+  }
+
+  .card-panel-interactive {
+    transition: box-shadow 0.15s ease;
+  }
+
+  .card-panel-interactive:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .dark .card-panel-interactive:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2),
+      0 4px 6px -4px rgb(0 0 0 / 0.2);
+  }
+
+  .highlight-panel {
+    margin-top: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: var(--spacing-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .tab-group {
+    display: inline-flex;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background-color: var(--secondary);
+    padding: 0.25rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .tab-trigger {
+    border-radius: var(--radius-md);
+    padding: var(--spacing-btn-y) var(--spacing-btn-x);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    color: var(--muted-foreground);
+  }
+
+  .tab-trigger:hover {
+    color: var(--foreground);
+  }
+
+  .tab-trigger-active {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .tab-trigger-pill {
+    border-radius: 9999px;
+    padding: var(--spacing-btn-y) var(--spacing-btn-x);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background-color: var(--card);
+    color: var(--muted-foreground);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .tab-trigger-pill:hover {
+    border-color: color-mix(in srgb, var(--ring) 70%, transparent);
+    color: var(--foreground);
+  }
+
+  .tab-trigger-pill-active {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: transparent;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .badge-pill {
+    @apply inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-foreground shadow-sm;
+  }
+
+  .alert-panel {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background-color: var(--muted);
+    padding: var(--spacing-input-y) var(--spacing-btn-x);
+    font-size: 0.875rem;
+    color: var(--foreground);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+}
