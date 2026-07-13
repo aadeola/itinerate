@@ -11,5 +11,8 @@ llm-proxy/node_modules/
 *.log
 .DS_Store
 
+# dev.sh single-instance lock (runtime artifact)
+.dev.sh.lock
+
 # Contains the Google Maps API key for the local MCP server
 .cursor/mcp.json

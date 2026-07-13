@@ -8,6 +8,21 @@ PROXY_LOOP_PID=""
 BACKEND_LOOP_PID=""
 FRONTEND_LOOP_PID=""
 
+# Single-instance guard: a second dev.sh would fight the first over ports
+# 8080/8081/5173 (each supervisor sweeps them on every restart), causing the
+# backend to be SIGTERM'd seconds after startup in an endless BUILD FAILURE
+# loop. Refuse to start if another supervisor is already alive.
+LOCK_FILE="$ROOT/.dev.sh.lock"
+if [[ -f "$LOCK_FILE" ]]; then
+  existing_pid="$(cat "$LOCK_FILE" 2>/dev/null || true)"
+  if [[ -n "$existing_pid" ]] && kill -0 "$existing_pid" 2>/dev/null; then
+    echo "dev.sh is already running (pid $existing_pid)."
+    echo "Stop that instance first, or run: kill $existing_pid"
+    exit 1
+  fi
+fi
+echo "$$" > "$LOCK_FILE"
+
 if [[ ! -f "$ROOT/llm-proxy/.env" ]]; then
   echo "Missing llm-proxy/.env — copy llm-proxy/.env.example and set CURSOR_API_KEY"
   exit 1
@@ -52,6 +67,7 @@ cleanup() {
   stop_port 8081
   stop_port 8080
   stop_port 5173
+  rm -f "$LOCK_FILE" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
