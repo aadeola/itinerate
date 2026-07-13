@@ -149,7 +149,7 @@ export default function App() {
           </header>
         )}
 
-        <main className={itinerary ? "" : "card-panel card-panel-lg"}>
+        <main className="card-panel card-panel-lg">
           {itinerary ? (
             <TimelineView itinerary={itinerary} onEdit={edit} onReset={reset} />
           ) : view === "screenshot" ? (

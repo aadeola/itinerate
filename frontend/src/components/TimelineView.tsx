@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import ItineraryMap from "./ItineraryMap";
 import { geocodeItinerary } from "../api";
 import type { GeocodedItinerary, Itinerary, ScheduledActivity } from "../types";
-import timelineStyles from "./TimelineView.module.css";
-
 interface TimelineViewProps {
   itinerary: Itinerary;
   onEdit: () => void;
@@ -74,7 +72,7 @@ export default function TimelineView({ itinerary, onEdit, onReset }: TimelineVie
   };
 
   return (
-    <div className={`${timelineStyles.root} animate-float-in`}>
+    <div className="animate-float-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
