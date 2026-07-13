@@ -1,6 +1,8 @@
 import type {
   GeocodedItinerary,
   Itinerary,
+  SavedItineraryDetail,
+  SavedItinerarySummary,
   ScrapbookDetail,
   ScrapbookSummary,
   TripRequest,
@@ -203,4 +205,62 @@ export async function deleteScrapbookImage(
     throw new Error(await errorMessage(response, SCRAPBOOK_STATUS_HINTS));
   }
   return (await response.json()) as ScrapbookDetail;
+}
+
+const SAVED_ITINERARY_STATUS_HINTS: Record<number, string> = {
+  404: "That saved itinerary could not be found.",
+};
+
+async function savedItineraryFetch(
+  path: string,
+  init?: RequestInit,
+): Promise<Response> {
+  try {
+    return await fetch(path, init);
+  } catch {
+    throw new Error(
+      "Could not reach the server. Is the backend running on port 8080?",
+    );
+  }
+}
+
+export async function listSavedItineraries(): Promise<SavedItinerarySummary[]> {
+  const response = await savedItineraryFetch("/api/saved-itineraries");
+  if (!response.ok) {
+    throw new Error(await errorMessage(response, SAVED_ITINERARY_STATUS_HINTS));
+  }
+  return (await response.json()) as SavedItinerarySummary[];
+}
+
+export async function saveItinerary(
+  itinerary: Itinerary,
+): Promise<SavedItinerarySummary> {
+  const response = await savedItineraryFetch("/api/saved-itineraries", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(itinerary),
+  });
+  if (!response.ok) {
+    throw new Error(await errorMessage(response, SAVED_ITINERARY_STATUS_HINTS));
+  }
+  return (await response.json()) as SavedItinerarySummary;
+}
+
+export async function getSavedItinerary(
+  id: number,
+): Promise<SavedItineraryDetail> {
+  const response = await savedItineraryFetch(`/api/saved-itineraries/${id}`);
+  if (!response.ok) {
+    throw new Error(await errorMessage(response, SAVED_ITINERARY_STATUS_HINTS));
+  }
+  return (await response.json()) as SavedItineraryDetail;
+}
+
+export async function deleteSavedItinerary(id: number): Promise<void> {
+  const response = await savedItineraryFetch(`/api/saved-itineraries/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error(await errorMessage(response, SAVED_ITINERARY_STATUS_HINTS));
+  }
 }

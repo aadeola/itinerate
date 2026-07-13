@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import ItineraryMap from "./ItineraryMap";
-import { geocodeItinerary } from "../api";
+import { geocodeItinerary, saveItinerary } from "../api";
 import type { GeocodedItinerary, Itinerary, ScheduledActivity } from "../types";
 interface TimelineViewProps {
   itinerary: Itinerary;
@@ -33,6 +33,10 @@ export default function TimelineView({ itinerary, onEdit, onReset }: TimelineVie
   const [geocodedItinerary, setGeocodedItinerary] = useState<GeocodedItinerary | null>(null);
   const [geocodeLoading, setGeocodeLoading] = useState(false);
   const [geocodeError, setGeocodeError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [showSaveBanner, setShowSaveBanner] = useState(false);
 
   const day =
     itinerary.days.find((d) => d.dayNumber === activeDay) ?? itinerary.days[0];
@@ -45,7 +49,31 @@ export default function TimelineView({ itinerary, onEdit, onReset }: TimelineVie
     setGeocodeError(null);
     setGeocodeLoading(false);
     setMapVisible(false);
+    setSaved(false);
+    setSaving(false);
+    setSaveError(null);
+    setShowSaveBanner(false);
   }, [itinerary]);
+
+  useEffect(() => {
+    if (!showSaveBanner) return;
+    const timer = setTimeout(() => setShowSaveBanner(false), 4000);
+    return () => clearTimeout(timer);
+  }, [showSaveBanner]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await saveItinerary(itinerary);
+      setSaved(true);
+      setShowSaveBanner(true);
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Could not save itinerary.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleToggleMap = async () => {
     if (mapVisible) {
@@ -114,8 +142,53 @@ export default function TimelineView({ itinerary, onEdit, onReset }: TimelineVie
             </svg>
             Start over
           </Button>
+          <button
+            type="button"
+            onClick={() => void handleSave()}
+            disabled={saving || saved}
+            className={
+              saved
+                ? "inline-flex shrink-0 items-center gap-[5px] border border-[#e0e0e0] bg-[#f5f5f5] px-[15px] py-[9px] text-[13px] font-medium text-[#333333] transition focus:outline focus:outline-2 focus:outline-[#cccccc] disabled:cursor-not-allowed disabled:opacity-50"
+                : "inline-flex shrink-0 items-center gap-[5px] border border-[#e4e4e7] bg-[#fefefe] px-[15px] py-[9px] text-[13px] font-medium text-[#1a1a1a] transition hover:bg-[#f0f0f0] focus:outline focus:outline-2 focus:outline-[#cccccc] disabled:cursor-not-allowed disabled:opacity-50"
+            }
+            style={{
+              borderRadius: "11px",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+            }}
+          >
+            <svg
+              viewBox="0 0 20 20"
+              className="h-[15px] w-[15px]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 3h10v14l-5-3-5 3V3z" />
+            </svg>
+            {saving ? "Saving..." : saved ? "Saved" : "Save itinerary"}
+          </button>
         </div>
       </div>
+
+      {saveError && (
+        <div
+          className="mt-4 rounded-[20px] border border-[#e6c6c6] px-4 py-3 text-[13px] text-[#8a3333]"
+          style={{ backgroundColor: "#faf2f2", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+        >
+          {saveError}
+        </div>
+      )}
+
+      {showSaveBanner && (
+        <div
+          className="mt-4 rounded-[20px] border border-[#e6e6e6] px-4 py-3 text-[13px] text-[#333333]"
+          style={{ backgroundColor: "#f6f6f6", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+        >
+          Itinerary saved.
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap gap-2">
         {itinerary.days.map((d) => {

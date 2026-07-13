@@ -96,3 +96,17 @@ export interface ScrapbookDetail {
   updatedAt: string;
   images: ScrapbookImage[];
 }
+
+export interface SavedItinerarySummary {
+  id: number;
+  city: string;
+  summary: string | null;
+  dayCount: number;
+  createdAt: string;
+}
+
+export interface SavedItineraryDetail {
+  id: number;
+  createdAt: string;
+  itinerary: Itinerary;
+}

@@ -1,6 +1,7 @@
 package com.itinerate.controller;
 
 import com.itinerate.service.PlannerException;
+import com.itinerate.service.SavedItineraryException;
 import com.itinerate.service.ScrapbookException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ScrapbookException.class)
     public ResponseEntity<Map<String, Object>> handleScrapbook(ScrapbookException ex) {
         log.warn("Scrapbook request failed: {}", ex.getMessage());
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("error", ex.getMessage());
+        body.put("messages", List.of(ex.getMessage()));
+        return ResponseEntity.status(ex.getStatus()).body(body);
+    }
+
+    @ExceptionHandler(SavedItineraryException.class)
+    public ResponseEntity<Map<String, Object>> handleSavedItinerary(SavedItineraryException ex) {
+        log.warn("Saved itinerary request failed: {}", ex.getMessage());
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", ex.getMessage());

@@ -4,11 +4,12 @@ import TripForm from "./components/TripForm";
 import TimelineView from "./components/TimelineView";
 import ScreenshotInfer from "./components/ScreenshotInfer";
 import ScrapbooksView from "./components/ScrapbooksView";
+import SavedItinerariesView from "./components/SavedItinerariesView";
 import { useTheme } from "./hooks/use-theme";
 import { planItinerary } from "./api";
 import type { ActivityInput, Itinerary, TripRequest } from "./types";
 
-type View = "plan" | "screenshot" | "scrapbooks";
+type View = "plan" | "screenshot" | "scrapbooks" | "saved";
 
 const DEFAULT_REQUEST: Omit<TripRequest, "activities"> = {
   city: "",
@@ -67,6 +68,10 @@ export default function App() {
     setFormKey((k) => k + 1);
   };
 
+  const openSavedItinerary = (it: Itinerary) => {
+    setItinerary(it);
+  };
+
   const initialValues = seededRequest ?? lastRequest ?? undefined;
 
   return (
@@ -116,12 +121,16 @@ export default function App() {
             <h1 className="mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
               {view === "scrapbooks"
                 ? "Build a visual scrapbook of your trip"
-                : "Plan the perfect order for your trip"}
+                : view === "saved"
+                  ? "Your saved itineraries"
+                  : "Plan the perfect order for your trip"}
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
               {view === "scrapbooks"
                 ? "Create scrapbooks for different trips or themes, then upload batches of photos to save your favorite moments."
-                : "Tell us the city, your days, and what you want to see. AI resolves each activity's location and sorts them into a smart, easy-to-follow timeline."}
+                : view === "saved"
+                  ? "Open any itinerary you've saved. They live on the server, so they persist between visits."
+                  : "Tell us the city, your days, and what you want to see. AI resolves each activity's location and sorts them into a smart, easy-to-follow timeline."}
             </p>
 
             <div className="tab-group mt-8">
@@ -146,6 +155,13 @@ export default function App() {
               >
                 Scrapbooks
               </button>
+              <button
+                type="button"
+                onClick={() => setView("saved")}
+                className={`tab-trigger ${view === "saved" ? "tab-trigger-active" : ""}`}
+              >
+                Saved
+              </button>
             </div>
           </header>
         )}
@@ -157,6 +173,8 @@ export default function App() {
             <ScreenshotInfer onAddActivity={handleAddActivity} />
           ) : view === "scrapbooks" ? (
             <ScrapbooksView />
+          ) : view === "saved" ? (
+            <SavedItinerariesView onOpen={openSavedItinerary} />
           ) : (
             <>
               {error && <p className="alert-panel mb-5">{error}</p>}
@@ -174,7 +192,9 @@ export default function App() {
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {view === "scrapbooks"
               ? "Scrapbooks are saved on the server so your photos persist between visits."
-              : "Planning uses an AI model to infer each activity's neighborhood and build a geographically sensible schedule."}
+              : view === "saved"
+                ? "Saved itineraries live on the server so they persist between visits."
+                : "Planning uses an AI model to infer each activity's neighborhood and build a geographically sensible schedule."}
           </p>
         )}
       </div>
