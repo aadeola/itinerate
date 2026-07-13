@@ -61,5 +61,8 @@ class GeocodingServiceIntegrationTest {
                         || result.geocodingError().toLowerCase().contains("api key")
                         || result.geocodingError().toLowerCase().contains("geocoding"),
                 "Expected a descriptive geocoding error, got: " + result.geocodingError());
+    
     }
+
+    //I need to add a test for a known landmark in atlanta that is not in the database;
 }
