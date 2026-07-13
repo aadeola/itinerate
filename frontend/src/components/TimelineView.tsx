@@ -114,10 +114,15 @@ export default function TimelineView({ itinerary, onEdit, onReset }: TimelineVie
           )}
         </div>
         <div className="flex flex-wrap gap-2 self-start">
-          <Button variant="outline" onClick={onEdit}>
+          <Button
+            variant="outline"
+            onClick={onEdit}
+            className="gap-[5px] border-[#e4e4e7] bg-[#fefefe] px-[15px] py-[9px] text-[13px] text-[#1a1a1a] shadow-none hover:bg-[#f0f0f0] focus:outline focus:outline-2 focus:outline-[#cccccc]"
+            style={{ borderRadius: "11px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+          >
             <svg
               viewBox="0 0 20 20"
-              className="h-4 w-4"
+              className="h-[15px] w-[15px]"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"
@@ -128,10 +133,15 @@ export default function TimelineView({ itinerary, onEdit, onReset }: TimelineVie
             </svg>
             Edit
           </Button>
-          <Button variant="outline" onClick={onReset}>
+          <Button
+            variant="outline"
+            onClick={onReset}
+            className="gap-[5px] border-[#e4e4e7] bg-[#fefefe] px-[15px] py-[9px] text-[13px] text-[#1a1a1a] shadow-none hover:bg-[#f0f0f0] focus:outline focus:outline-2 focus:outline-[#cccccc]"
+            style={{ borderRadius: "11px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+          >
             <svg
               viewBox="0 0 20 20"
-              className="h-4 w-4"
+              className="h-[15px] w-[15px]"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"

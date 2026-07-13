@@ -7,6 +7,8 @@ import com.itinerate.model.Itinerary;
 import com.itinerate.model.SavedItineraryDetail;
 import com.itinerate.model.SavedItinerarySummary;
 import com.itinerate.repository.SavedItineraryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,8 @@ import java.util.List;
 
 @Service
 public class SavedItineraryService {
+
+    private static final Logger log = LoggerFactory.getLogger(SavedItineraryService.class);
 
     private final SavedItineraryRepository repository;
     private final ObjectMapper objectMapper;
@@ -26,10 +30,12 @@ public class SavedItineraryService {
 
     @Transactional(readOnly = true)
     public List<SavedItinerarySummary> list() {
-        return repository.findAll().stream()
+        List<SavedItinerarySummary> summaries = repository.findAll().stream()
                 .sorted(Comparator.comparing(SavedItinerary::getCreatedAt).reversed())
                 .map(this::toSummary)
                 .toList();
+        log.info("Listed {} saved itineraries.", summaries.size());
+        return summaries;
     }
 
     @Transactional
@@ -43,11 +49,15 @@ public class SavedItineraryService {
         } catch (JsonProcessingException e) {
             throw SavedItineraryException.serializationFailed("Could not save the itinerary.", e);
         }
-        return toSummary(repository.save(entity));
+        SavedItinerarySummary summary = toSummary(repository.save(entity));
+        log.info("Saved itinerary id={} for city='{}' ({} days).",
+                summary.id(), summary.city(), summary.dayCount());
+        return summary;
     }
 
     @Transactional(readOnly = true)
     public SavedItineraryDetail get(Long id) {
+        log.info("Fetching saved itinerary id={}.", id);
         SavedItinerary entity = repository.findById(id)
                 .orElseThrow(SavedItineraryException::notFound);
         Itinerary itinerary;
@@ -64,6 +74,7 @@ public class SavedItineraryService {
         SavedItinerary entity = repository.findById(id)
                 .orElseThrow(SavedItineraryException::notFound);
         repository.delete(entity);
+        log.info("Deleted saved itinerary id={}.", id);
     }
 
     private SavedItinerarySummary toSummary(SavedItinerary entity) {
