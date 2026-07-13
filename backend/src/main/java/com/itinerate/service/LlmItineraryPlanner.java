@@ -141,7 +141,7 @@ public class LlmItineraryPlanner implements ItineraryPlanner {
                 Schedule exactly one item per listed activity (no extras). Keep the summary
                 to one short sentence and each reason under 8 words.
                 Every item needs a non-empty "location". Respond ONLY with JSON:
-                {"summary":"one sentence","days":[{"dayNumber":1,"items":[{"name":"","location":"","startTime":"09:00","endTime":"10:30","reason":""}]}]}
+                {"city":"canonical English city name","summary":"one sentence","days":[{"dayNumber":1,"items":[{"name":"","location":"","startTime":"09:00","endTime":"10:30","reason":""}]}]}
                 """;
     }
 
@@ -204,7 +204,9 @@ public class LlmItineraryPlanner implements ItineraryPlanner {
         }
 
         String summary = root.path("summary").asText(null);
-        return new Itinerary(request.city(), days, summary);
+        String llmCity = text(root, "city");
+        String city = llmCity != null ? llmCity : request.city();
+        return new Itinerary(city, days, summary);
     }
 
     private void validateItem(ScheduledActivity item, int dayNumber) {

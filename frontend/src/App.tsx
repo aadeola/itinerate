@@ -35,6 +35,7 @@ export default function App() {
     try {
       const result = await planItinerary(request);
       setItinerary(result);
+      setLastRequest({ ...request, city: result.city });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {

@@ -43,7 +43,6 @@ async function errorMessage(
 }
 
 export async function planItinerary(request: TripRequest): Promise<Itinerary> {
-  const t0 = Date.now();
   let response: Response;
   try {
     response = await fetch("/api/itinerary/plan", {
@@ -52,8 +51,12 @@ export async function planItinerary(request: TripRequest): Promise<Itinerary> {
       body: JSON.stringify(request),
     });
   } catch {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const onDevServer = origin.includes(":5173");
     throw new Error(
-      "Could not reach the planner. Is the backend running on port 8080?",
+      onDevServer
+        ? "Could not reach the planner. Ensure ./scripts/dev.sh is running and the backend is healthy at http://localhost:8080/api/health."
+        : "Could not reach the planner. Open http://localhost:5173 (run ./scripts/dev.sh or cd frontend && npm run dev) so API requests can proxy to the backend on port 8080.",
     );
   }
 
@@ -61,26 +64,7 @@ export async function planItinerary(request: TripRequest): Promise<Itinerary> {
     throw new Error(await errorMessage(response, STATUS_HINTS));
   }
 
-  const itinerary = (await response.json()) as Itinerary;
-  // #region agent log
-  fetch("http://127.0.0.1:7661/ingest/5273d649-8946-4d8f-9e26-0228c43936fb", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "4fb88c" },
-    body: JSON.stringify({
-      sessionId: "4fb88c",
-      hypothesisId: "E",
-      location: "frontend/src/api.ts:planItinerary",
-      message: "Frontend plan complete",
-      data: {
-        elapsedMs: Date.now() - t0,
-        activityCount: request.activities.length,
-        city: request.city,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-  return itinerary;
+  return (await response.json()) as Itinerary;
 }
 
 const GEOCODE_STATUS_HINTS: Record<number, string> = {

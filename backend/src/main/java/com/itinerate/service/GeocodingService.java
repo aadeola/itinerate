@@ -10,6 +10,7 @@ import com.itinerate.model.Itinerary;
 import com.itinerate.model.ScheduledActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -24,13 +25,36 @@ import java.util.List;
 public class GeocodingService {
 
     private static final Logger log = LoggerFactory.getLogger(GeocodingService.class);
+    private static final String CITY_FIELD_MASK =
+            "results.types,results.addressComponents,results.location,results.postalAddress";
 
     private final GeocodingProperties properties;
     private final RestClient restClient;
 
+    @Autowired
     public GeocodingService(GeocodingProperties properties) {
+        this(properties, RestClient.builder().build());
+    }
+
+    GeocodingService(GeocodingProperties properties, RestClient restClient) {
         this.properties = properties;
-        this.restClient = RestClient.builder().build();
+        this.restClient = restClient;
+    }
+
+    /**
+     * Chooses the display city for an itinerary. The planner already resolves the
+     * canonical English city name (correcting typos like {@code alanta} to
+     * {@code Atlanta} from the activities it schedules), so we trust that value and
+     * fall back to the traveler-typed city only when it is missing.
+     */
+    public String inferCityFromItinerary(Itinerary itinerary, String typedCity) {
+        if (itinerary != null && itinerary.city() != null && !itinerary.city().isBlank()) {
+            return toTitleCase(itinerary.city().trim());
+        }
+        if (typedCity != null && !typedCity.isBlank()) {
+            return toTitleCase(typedCity.trim());
+        }
+        return typedCity;
     }
 
     public GeocodedItinerary geocode(Itinerary itinerary) {
@@ -88,20 +112,7 @@ public class GeocodingService {
         }
 
         try {
-            // Geocoding API v4: address is a URL path segment, auth via X-Goog-Api-Key header.
-            URI uri = UriComponentsBuilder.fromHttpUrl(properties.getBaseUrl())
-                    .pathSegment("address", query)
-                    .build()
-                    .encode()
-                    .toUri();
-
-            JsonNode response = restClient.get()
-                    .uri(uri)
-                    .header("X-Goog-Api-Key", properties.getApiKey())
-                    .header("X-Goog-FieldMask", "results.location,results.formattedAddress")
-                    .retrieve()
-                    .body(JsonNode.class);
-
+            JsonNode response = geocodeAddress(query);
             if (response == null) {
                 return new GeocodeAttempt(GeocodedScheduledActivity.from(activity, null, null), null);
             }
@@ -131,6 +142,39 @@ public class GeocodingService {
                     GeocodedScheduledActivity.from(activity, null, null),
                     e.getMessage());
         }
+    }
+
+    private JsonNode geocodeAddress(String query) {
+        URI uri = UriComponentsBuilder.fromHttpUrl(properties.getBaseUrl())
+                .pathSegment("address", query)
+                .build()
+                .encode()
+                .toUri();
+
+        return restClient.get()
+                .uri(uri)
+                .header("X-Goog-Api-Key", properties.getApiKey())
+                .header("X-Goog-FieldMask", CITY_FIELD_MASK)
+                .retrieve()
+                .body(JsonNode.class);
+    }
+
+    String toTitleCase(String name) {
+        String[] words = name.trim().split("\\s+");
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            if (i > 0) {
+                builder.append(' ');
+            }
+            String word = words[i];
+            if (!word.isEmpty()) {
+                builder.append(Character.toUpperCase(word.charAt(0)));
+                if (word.length() > 1) {
+                    builder.append(word.substring(1));
+                }
+            }
+        }
+        return builder.toString();
     }
 
     private String parseV4ErrorMessage(String body) {
